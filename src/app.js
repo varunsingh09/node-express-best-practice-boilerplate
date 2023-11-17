@@ -1,8 +1,10 @@
 const express = require('express');
 const helmet = require('helmet');
 const xss = require('xss-clean');
+const session = require('express-session');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
@@ -37,6 +39,18 @@ app.use(mongoSanitize());
 // gzip compression
 app.use(compression());
 
+// secure cookies session
+app.use(
+  session({
+    // set a custom name for the session cookie
+    name: process.env.MY_CUSTOM_COOKIE_NAME,
+    // a secure secret key for session encryption
+    secret: process.env.MY_CUSTOM_SECRATE_KEY,
+  }),
+);
+
+//limit request size
+app.use(bodyParser.json({ limit: '5mb' }));
 // enable cors
 app.use(cors());
 app.options('*', cors());
